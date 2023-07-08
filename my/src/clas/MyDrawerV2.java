@@ -59,6 +59,7 @@ public class MyDrawerV2 extends JPanel {
 				line.addPoint(x, y);// 加點
 				lines.add(line);// lines+line
 			}
+
 		}
 
 		@Override
@@ -67,12 +68,18 @@ public class MyDrawerV2 extends JPanel {
 			if (boom(x, y)) {
 				lines.getLast().addPoint(x, y);
 				repaint();
-				//System.out.println(lines.getLast().getSize());
+				System.out.println(lines.getLast().getSize());
+
+			} else {
+				
+				new gameover();
 			}
 
 		}
 
 		public void mouseReleased(MouseEvent e) {
+			
+			new gameover();
 
 		}
 	}
@@ -80,7 +87,7 @@ public class MyDrawerV2 extends JPanel {
 	public boolean boom(int mouseX, int mouseY) {
 		int a = mouseX - 375, b = mouseY - 375;
 		double L = Math.pow((Math.pow(a, 2) + Math.pow(b, 2)), 0.5);
-		if (L > 225 && L < 240) {
+		if (L > 225 + 2 && L < 240 - 2) {
 			return true;
 		} else {
 			return false;
@@ -99,7 +106,7 @@ public class MyDrawerV2 extends JPanel {
 			g2d.setStroke(new BasicStroke(line.getWidth()));
 
 			for (int i = 1; i < line.getSize(); i++) {
-				
+
 				g2d.drawLine(line.getPointX(i - 1), line.getPointY(i - 1), line.getPointX(i), line.getPointY(i));
 
 			}
@@ -176,7 +183,10 @@ class Line implements Serializable {
 		HashMap<String, Integer> point = new HashMap<>();
 		point.put("x", x);
 		point.put("y", y);
-		points.add(point);
+		if (!points.contains(point)) {
+			points.add(point);
+		}
+
 	}
 
 	public int getPointX(int index) {
