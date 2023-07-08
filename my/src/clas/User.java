@@ -18,6 +18,7 @@ public class User {
 
 	public User(String a, String p) {
 		try {
+
 			this.UserAccount = a;
 
 			Properties prop = new Properties();
@@ -29,7 +30,7 @@ public class User {
 			PreparedStatement pstmtDup = conn.prepareStatement(sqlDup);
 			pstmtDup.setString(1, a); // 將帳號設定為查詢語句的參數
 			ResultSet rs = pstmtDup.executeQuery(); // 執行查詢
-
+					
 			if (rs.next()) { // 如果查詢結果存在記錄，表示帳號已存在
 				String hasPasswd = rs.getString("password"); // 取得資料庫中儲存的密碼
 				if (BCrypt.checkpw(p, hasPasswd)) { // 檢查輸入的密碼是否與資料庫中的密碼相符
@@ -42,6 +43,8 @@ public class User {
 				PreparedStatement pstmt = conn.prepareStatement(sql);
 				pstmt.setString(1, a); // 將帳號設定為插入語句的參數
 				pstmt.setString(2, BCrypt.hashpw(p, BCrypt.gensalt())); // 將密碼進行雜湊處理後設定為插入語句的參數
+				pstmt.executeUpdate();
+
 				d = 1; // 新增帳號成功
 			}
 		} catch (Exception e) {
@@ -50,7 +53,7 @@ public class User {
 
 	}
 
-	public void UpdateScore() {
+	public void UpdateScore(String score) {
 		try {
 			String sqlDup = "SELECT * FROM member WHERE account = ?"; // 查詢指定帳號的SQL語句
 			PreparedStatement pstmtDup = conn.prepareStatement(sqlDup, ResultSet.TYPE_SCROLL_INSENSITIVE,
@@ -60,8 +63,8 @@ public class User {
 			ResultSet rs = pstmtDup.executeQuery(); // 執行查詢
 
 			rs.absolute(1); // 將結果集的指標移動到第一筆記錄
-
-			rs.updateString("score", "0"); // 更新該筆記錄中的score欄位為0
+			 
+			rs.updateString("score", score); // 更新該筆記錄中的score欄位為0
 			rs.updateRow(); // 將更新寫入資料庫
 
 		} catch (Exception e) {

@@ -23,13 +23,16 @@ public class MemberDB {
 	public void queryData() throws SQLException {
 		Statement stmt = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
 					ResultSet.CONCUR_UPDATABLE);
-		rs = stmt.executeQuery("SELECT * FROM member");
+//		stmt.setMaxRows(3);
+		rs = stmt.executeQuery("SELECT account,score FROM member order by score desc");
 		
 		ResultSetMetaData rsmd = rs.getMetaData();
 		fieldNames = new String[rsmd.getColumnCount()];
 		for (int i=0; i<fieldNames.length; i++) {
 			fieldNames[i] = rsmd.getColumnName(i+1);
 		}
+		
+		
 		
 	}
 	
@@ -52,5 +55,13 @@ public class MemberDB {
 			return "XXX";
 		}
 	}
+	public String getData(int row, String col) {
+		try {
+			rs.absolute(row);
+			return rs.getString(col);
+		}catch(Exception e) {
+			return "XXX";
+		}
+	}	
 	
 }

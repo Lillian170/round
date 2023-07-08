@@ -6,10 +6,12 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import clas.MemberDB;
 import clas.User;
 
 public class Server {
 	User y;
+
 	public Server() {
 		try {
 			// 建立伺服器端的ServerSocket物件，並指定監聽的埠號為8888
@@ -22,7 +24,7 @@ public class Server {
 
 			// 建立讀取客戶端訊息的BufferedReader物件
 			BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			
+
 			// 建立寫入回覆訊息的PrintWriter物件
 			PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
 
@@ -45,24 +47,38 @@ public class Server {
 				} else if (y.d == 2) {
 					// 若d值為2，表示登入成功，傳送登入成功訊息給客戶端
 					writer.println("登入成功");
-					//y.UpdateScore();
+					// y.UpdateScore();
 					// 關閉ServerSocket，結束程式
 					serverSocket.close();
 					break;
 				} else {
 					// 若d值不為1或2，表示密碼錯誤，傳送密碼錯誤訊息給客戶端
 					writer.println("密碼錯誤");
-				}			
-			}			
+				}
+			}
+
+			while (true) {
+				String score = reader.readLine();
+				System.out.println(score);
+				y.UpdateScore(score);
+				
+				MemberDB memberDB = new MemberDB();
+				memberDB.queryData();
+				for(int i =1;i<4;i++) {
+//					System.out.println(memberDB.getData(i,"account"));
+//					System.out.println(memberDB.getData(i,"score"));
+					writer.println(memberDB.getData(i,"account"));
+					writer.println(memberDB.getData(i,"score"));			
+				}
+			}
 		} catch (Exception e) {
 			// 若發生例外錯誤，印出錯誤訊息
 			System.err.println(e);
 		}
-		
-		
+
 	}
+
 	public static void main(String[] args) {
-		new Server();	
+		new Server();
 	}
 }
-

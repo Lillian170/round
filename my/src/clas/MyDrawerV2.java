@@ -1,41 +1,68 @@
 package clas;
 
 import java.awt.BasicStroke;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
 import java.io.Serializable;
+import java.net.Socket;
 import java.util.HashMap;
 import java.util.LinkedList;
-
 import javax.imageio.ImageIO;
+import javax.swing.JButton;
 import javax.swing.JPanel;
 
 public class MyDrawerV2 extends JPanel {
 	private LinkedList<Line> lines, garbag;
 	private Color nowColor;
 	private float nowWidth;
+	private boolean islive;
+	private JButton f5;
+	private PrintWriter writer;
+	private BufferedReader serverReader;
 
-	public MyDrawerV2() {
+	public MyDrawerV2(PrintWriter writer, BufferedReader serverReader) {
 		lines = new LinkedList<>();
 		garbag = new LinkedList<>();
-		// setBackground(Color.YELLOW);
 		MyListener myListener = new MyListener();
 		addMouseListener(myListener);
 		addMouseMotionListener(myListener);
-
+		this.writer = writer;
+		this.serverReader = serverReader;
+		f5 = new JButton("再來一局");
+		add(f5);
+		f5.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				clear();
+			}
+		});
 		nowColor = Color.BLUE;
 		nowWidth = 4;
+		islive = true;
+	}
 
+	public boolean getislive() {
+		return islive;
+	}
+
+	public int getscore() {
+		if (lines.size() != 0)
+			return lines.getLast().getSize();
+		return 0;
 	}
 
 	public void setColor(Color newColor) {
@@ -51,36 +78,36 @@ public class MyDrawerV2 extends JPanel {
 	}
 
 	private class MyListener extends MouseAdapter {
-		@Override
 		public void mousePressed(MouseEvent e) {
 			int x = e.getX(), y = e.getY();
 			Line line = new Line(nowColor, nowWidth);// 加line
-			if (boom(x, y)) {
+			if (boom(x, y) && islive) {
 				line.addPoint(x, y);// 加點
 				lines.add(line);// lines+line
+			} else if(lines.size() != 0 ){
+				islive = false;
+				repaint();
 			}
-
 		}
 
-		@Override
 		public void mouseDragged(MouseEvent e) {
 			int x = e.getX(), y = e.getY();
-			if (boom(x, y)) {
+			if (boom(x, y) && islive) {
 				lines.getLast().addPoint(x, y);
 				repaint();
 				System.out.println(lines.getLast().getSize());
-
-			} else {
-				
-				new gameover();
+			} else if(lines.size() != 0 ){
+				islive = false;
+				repaint();
 			}
-
 		}
 
 		public void mouseReleased(MouseEvent e) {
-			
-			new gameover();
-
+//			new gameover();
+			if (lines.size() != 0) {
+				islive = false;
+				repaint();
+			}
 		}
 	}
 
@@ -94,21 +121,16 @@ public class MyDrawerV2 extends JPanel {
 		}
 	}
 
-	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D g2d = (Graphics2D) g;
 		g.drawOval(150, 150, 450, 450);
 		g.drawOval(135, 135, 480, 480);
-
 		for (Line line : lines) {
 			g2d.setColor(line.getColor());
 			g2d.setStroke(new BasicStroke(line.getWidth()));
-
 			for (int i = 1; i < line.getSize(); i++) {
-
 				g2d.drawLine(line.getPointX(i - 1), line.getPointY(i - 1), line.getPointX(i), line.getPointY(i));
-
 			}
 		}
 	}
@@ -117,6 +139,7 @@ public class MyDrawerV2 extends JPanel {
 		lines.clear();
 		garbag.clear();
 		repaint();
+		islive = true;
 	}
 
 	public void undo() {
@@ -162,10 +185,8 @@ public class MyDrawerV2 extends JPanel {
 		Object obj = oin.readObject();
 		lines = (LinkedList<Line>) obj;
 		oin.close();
-
 		repaint();
 	}
-
 }
 
 class Line implements Serializable {
@@ -186,7 +207,6 @@ class Line implements Serializable {
 		if (!points.contains(point)) {
 			points.add(point);
 		}
-
 	}
 
 	public int getPointX(int index) {
@@ -208,5 +228,4 @@ class Line implements Serializable {
 	public float getWidth() {
 		return width;
 	}
-
 }
