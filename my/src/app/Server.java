@@ -6,6 +6,8 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import clas.User;
+
 public class Server {
 	User y;
 	public Server() {
