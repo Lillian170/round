@@ -64,9 +64,8 @@ public class Server {
 				
 				MemberDB memberDB = new MemberDB();
 				memberDB.queryData();
-				for(int i =1;i<4;i++) {
-//					System.out.println(memberDB.getData(i,"account"));
-//					System.out.println(memberDB.getData(i,"score"));
+				for(int i =1;i<4;i++) {//取前3名
+
 					writer.println(memberDB.getData(i,"account"));
 					writer.println(memberDB.getData(i,"score"));			
 				}

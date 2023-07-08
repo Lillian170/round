@@ -3,6 +3,8 @@ package app;
 import java.io.*;
 import java.net.*;
 import javax.swing.*;
+
+import clas.Inquire;
 import clas.MyDrawerV2;
 import clas.MyTable;
 import java.awt.*;
