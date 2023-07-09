@@ -63,10 +63,11 @@ public class User {
 			ResultSet rs = pstmtDup.executeQuery(); // 執行查詢
 
 			rs.absolute(1); // 將結果集的指標移動到第一筆記錄
-
+			
+			if(Integer.parseInt(score)>rs.getInt("score")) {
 			rs.updateString("score", score); // 更新該筆記錄中的score欄位為指定的分數
 			rs.updateRow(); // 將更新寫入資料庫
-
+			}
 		} catch (Exception e) { // 處理例外情況
 			System.out.println(e); // 輸出例外訊息
 		}
