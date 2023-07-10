@@ -19,7 +19,7 @@ public class Client extends JFrame {
 	private Socket socket; // 用於與伺服器建立連接的Socket對象
 	private PrintWriter writer; // 用於向伺服器發送數據的PrintWriter對象
 	private BufferedReader serverReader; // 用於從伺服器接收數據的BufferedReader對象
-
+	private int myport;
 	public Client() {
 		super("入口"); // 設定窗口標題
 
@@ -44,13 +44,14 @@ public class Client extends JFrame {
 
 		o = new MyDrawerV2(writer, serverReader);
 		submitButton2 = new JButton("送出成績");
-
+		
+		myport = -1;
 		submitButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				int myport=-1;
-				for (int port = 8888; port <= 8890; port++) {
+				
+				for (int port = 8888; port <= 8890 && myport ==-1; port++) {
 					try {
-						socket = new Socket("172.20.10.4", port); // 建立與伺服器的連接，伺服器的IP地址為172.20.10.4，端口號為8888
+						socket = new Socket("10.0.101.92", port); // 建立與伺服器的連接，伺服器的IP地址為172.20.10.4，端口號為8888
 						writer = new PrintWriter(socket.getOutputStream(), true); // 建立向伺服器發送數據的PrintWriter對象
 						serverReader = new BufferedReader(new InputStreamReader(socket.getInputStream())); // 建立從伺服器接收數據的BufferedReader對象
 						myport = port;
